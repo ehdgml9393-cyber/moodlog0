@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../feed/ui/feed_screen.dart';
 
 class AuthProvider extends ChangeNotifier {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
+  final SupabaseClient _supabase = Supabase.instance.client;
 
-  // ✅ clientId 추가 (웹 로그인 필수)
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId:
-    '761202198915-g83qhnmifbo8s2h22mqmduafsfr90s8g.apps.googleusercontent.com',
+    clientId: '761202198915-g83qhnmifbo8s2h22mqmduafsfr90s8g.apps.googleusercontent.com',
   );
 
-  User? get user => _auth.currentUser;
+  firebase_auth.User? get user => _auth.currentUser;
 
   Future<void> signInWithGoogle(BuildContext context) async {
     try {
       final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return; // 로그인 취소 시 종료
+      if (googleUser == null) return;
 
       final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
+      final credential = firebase_auth.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      await _auth.signInWithCredential(credential);
+      final userCredential = await _auth.signInWithCredential(credential);
+      final firebase_auth.User user = userCredential.user!;
+      await _ensureUserInSupabase(user);
 
-      // ✅ 로그인 성공 후 피드 화면으로 이동
       if (context.mounted) {
         Navigator.pushReplacement(
           context,
@@ -35,10 +36,28 @@ class AuthProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
-      print("구글 로그인 오류: $e");
+      debugPrint("❌ 로그인 실패: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("로그인 실패: $e")),
       );
+    }
+  }
+
+  Future<void> _ensureUserInSupabase(firebase_auth.User user) async {
+    final existingUser = await _supabase
+        .from('users')
+        .select()
+        .eq('user_id', user.uid)
+        .maybeSingle();
+
+    if (existingUser == null) {
+      await _supabase.from('users').insert({
+        'user_id': user.uid,
+        'provider': 'google',
+        'nickname': user.displayName ?? '이름없음',
+        'profile_image': user.photoURL,
+        'created_at': DateTime.now().toIso8601String(),
+      });
     }
   }
 
@@ -48,4 +67,3 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
-

@@ -27,6 +27,9 @@ dependencies:
   # ✅ (선택) 나중에 피드 Firestore로 옮길 때 필요
   cloud_firestore: ^5.1.0
 
+  supabase_flutter: ^2.5.0
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
