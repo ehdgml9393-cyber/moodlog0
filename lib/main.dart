@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'firebase_options.dart';
-
-import 'features/auth/viewmodel/auth_provider.dart';
 import 'features/feed/viewmodel/feed_provider.dart';
+import 'firebase_options.dart';
+import 'features/auth/viewmodel/auth_provider.dart';
 import 'features/records/viewmodel/record_provider.dart';
 import 'features/auth/ui/onboarding_screen.dart';
 

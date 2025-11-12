@@ -31,7 +31,7 @@ class AuthRepository {
           .maybeSingle();
 
       if (existingUser != null) {
-        print('✅ 기존 유저 로그인: ${existingUser['nickname']}');
+        print(' 기존 유저 로그인: ${existingUser['nickname']}');
         return existingUser;
       } else {
         final newUserData = {
@@ -45,7 +45,7 @@ class AuthRepository {
         return newUserData;
       }
     } catch (e) {
-      print('❌ 로그인 오류: $e');
+      print(' 로그인 오류: $e');
       rethrow;
     }
   }

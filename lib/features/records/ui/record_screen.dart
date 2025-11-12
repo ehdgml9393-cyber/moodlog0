@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import '../../feed/viewmodel/feed_provider.dart';
 import '../../feed/ui/feed_screen.dart';
 import '../viewmodel/record_provider.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-
 
 class RecordScreen extends StatefulWidget {
   const RecordScreen({super.key});
@@ -64,7 +64,6 @@ class _RecordScreenState extends State<RecordScreen> {
                   final recordProvider = Provider.of<RecordProvider>(context, listen: false);
                   final user = firebase_auth.FirebaseAuth.instance.currentUser;
 
-
                   if (user == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("로그인된 사용자가 없습니다.")),
@@ -97,4 +96,3 @@ class _RecordScreenState extends State<RecordScreen> {
     );
   }
 }
-

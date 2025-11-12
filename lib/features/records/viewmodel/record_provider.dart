@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
 
 class RecordProvider extends ChangeNotifier {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   Future<void> addRecord({
-    required String userId,   // ← 파라미터로 userId 받기
+    required String userId,
     required String emotion,
     required String content,
   }) async {
@@ -17,11 +18,12 @@ class RecordProvider extends ChangeNotifier {
         'created_at': DateTime.now().toIso8601String(),
       });
 
-      print("✅ 기록 저장 성공");
+      print("기록 저장 성공");
       notifyListeners();
     } catch (e) {
-      print("❌ 기록 저장 실패: $e");
+      print("기록 저장 실패: $e");
       rethrow;
     }
   }
 }
+

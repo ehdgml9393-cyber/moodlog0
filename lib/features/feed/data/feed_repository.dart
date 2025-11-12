@@ -1,39 +1,19 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 class FeedRepository {
-  //임시 하ㅏ드코딩
-  final List<Map<String, dynamic>> _dummyFeeds = [
-    {
-      "username": "동희",
-      "mood": "😊 행복해요",
-      "content": "오늘 날씨가 좋아서 기분이 좋아요!",
-      "time": "2시간 전",
-    },
-    {
-      "username": "동희2",
-      "mood": "😢 슬퍼요",
-      "content": "조금 외로운 하루였어요...",
-      "time": "5시간 전",
-    },
-    {
-      "username": "동희3",
-      "mood": "😢 슬퍼요",
-      "content": "조금 외로운 하루였어요...",
-      "time": "5시간 전",
-    },
-    {
-      "username": "동희4",
-      "mood": "😢 슬퍼요",
-      "content": "조금 외로운 하루였어요...",
-      "time": "5시간 전",
-    },
+  final SupabaseClient _supabase = Supabase.instance.client;
 
-
-
-  ];
-
-  // 피드 가져오기
-  Future<List<Map<String, dynamic>>> fetchFeeds() async {
-
-    await Future.delayed(const Duration(milliseconds: 500)); // 로딩 시뮬레이션
-    return _dummyFeeds;
+  Future<List<Map<String, dynamic>>> getFeeds() async {
+    try {
+      final response = await _supabase
+          .from('records')
+          .select('*')
+          .order('created_at', ascending: false);
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print(' 피드 로드 실패: $e');
+      return [];
+    }
   }
 }
+

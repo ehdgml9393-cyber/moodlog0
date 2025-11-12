@@ -36,7 +36,7 @@ class AuthProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
-      debugPrint("❌ 로그인 실패: $e");
+      debugPrint(" 로그인 실패: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("로그인 실패: $e")),
       );

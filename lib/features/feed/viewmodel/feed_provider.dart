@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import '../data/feed_repository.dart';
 
 class FeedProvider extends ChangeNotifier {
-  bool _isLoading = false;
-  List<Map<String, dynamic>> _feeds = [];
+  final FeedRepository _repo = FeedRepository();
 
-  bool get isLoading => _isLoading;
-  List<Map<String, dynamic>> get feeds => _feeds;
+  List<Map<String, dynamic>> feeds = [];
+  bool isLoading = false;
 
-  /// 피드 불러오기
   Future<void> loadFeeds() async {
-    _isLoading = true;
-    notifyListeners();
-    _isLoading = false;
-    notifyListeners();
+    try {
+      isLoading = true;
+      notifyListeners();
+      feeds = await _repo.getFeeds();
+    } catch (e) {
+      print(' 피드 불러오기 오류: $e');
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }
