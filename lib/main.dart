@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodlog0/features/profile/viewmodel/profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -36,6 +37,8 @@ class MoodLogApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => FeedProvider()),
         ChangeNotifierProvider(create: (_) => RecordProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+
       ],
       child: MaterialApp(
         title: 'MoodLog',
