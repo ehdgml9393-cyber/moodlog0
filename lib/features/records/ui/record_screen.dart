@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import '../../feed/viewmodel/feed_provider.dart';
 import '../../feed/ui/feed_screen.dart';
 import '../viewmodel/record_provider.dart';
 

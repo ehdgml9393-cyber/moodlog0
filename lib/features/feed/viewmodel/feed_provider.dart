@@ -8,15 +8,17 @@ class FeedProvider extends ChangeNotifier {
   bool isLoading = false;
 
   Future<void> loadFeeds() async {
+    isLoading = true;
+    notifyListeners();
+
     try {
-      isLoading = true;
-      notifyListeners();
       feeds = await _repo.getFeeds();
     } catch (e) {
-      print(' 피드 불러오기 오류: $e');
-    } finally {
-      isLoading = false;
-      notifyListeners();
+      print("Feed load error: $e");
     }
+
+    isLoading = false;
+    notifyListeners();
   }
 }
+

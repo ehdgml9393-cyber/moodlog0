@@ -4,58 +4,53 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthRepository {
   final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: '761202198915-g83qhnmifbo8s2h22mqmduafsfr90s8g.apps.googleusercontent.com',
-  );
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  Future<Map<String, dynamic>?> signInWithGoogle() async {
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId:
+    '761202198915-g83qhnmifbo8s2h22mqmduafsfr90s8g.apps.googleusercontent.com',
+  );
+
+  Future<void> signInWithGoogle() async {
     try {
       final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
+      if (googleUser == null) return;
 
       final googleAuth = await googleUser.authentication;
+
       final credential = firebase_auth.GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
       final userCredential = await _auth.signInWithCredential(credential);
-      final user = userCredential.user;
-      if (user == null) return null;
+      final user = userCredential.user!;
+      final displayName = user.displayName ?? "사용자";
 
-      final existingUser = await _supabase
-          .from('users')
+      // Supabase users 동기화
+      final existing = await _supabase
+          .from("users")
           .select()
-          .eq('user_id', user.uid)
+          .eq("user_id", user.uid)
           .maybeSingle();
 
-      if (existingUser != null) {
-        print(' 기존 유저 로그인: ${existingUser['nickname']}');
-        return existingUser;
-      } else {
-        final newUserData = {
+      if (existing == null) {
+        await _supabase.from("users").insert({
           'user_id': user.uid,
           'provider': 'google',
-          'nickname': user.displayName ?? '이름없음',
+          'nickname': displayName,
           'profile_image': user.photoURL,
-          'created_at': DateTime.now().toIso8601String(),
-        };
-        await _supabase.from('users').insert(newUserData);
-        return newUserData;
+        });
+      } else {
+        await _supabase.from("users").update({
+          'nickname': displayName,
+          'profile_image': user.photoURL,
+        }).eq("user_id", user.uid);
       }
     } catch (e) {
-      print(' 로그인 오류: $e');
+      print("Google 로그인 오류: $e");
       rethrow;
     }
   }
-
-  Future<void> signOut() async {
-    await _googleSignIn.signOut();
-    await _auth.signOut();
-  }
-
-  firebase_auth.User? get currentUser => _auth.currentUser;
 }
-
 
