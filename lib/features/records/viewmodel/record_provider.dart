@@ -15,7 +15,7 @@ class RecordProvider extends ChangeNotifier {
         'user_id': userId,
         'emotion': emotion,
         'content': content,
-        'created_at': DateTime.now().toIso8601String(),
+        'created_at': DateTime.now(),
       });
 
       print("기록 저장 성공");

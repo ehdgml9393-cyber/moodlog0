@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/utils/date.dart';
 import '../viewmodel/feed_provider.dart';
 import '../../records/ui/record_screen.dart';
 import '../../profile/ui/my_profile_screen.dart';
@@ -115,9 +116,9 @@ class _FeedScreenState extends State<FeedScreen> {
                   const SizedBox(height: 4),
                   Text(feed["content"] ?? ""),
                   const SizedBox(height: 6),
-                  Text(
-                    feed["created_at"] ?? "",
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+              Text(
+                formatDate(feed["created_at"]),
+                style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                 ],
               ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/utils/date.dart';
 import '../viewmodel/user_profile_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -106,7 +107,7 @@ class UserProfileScreen extends StatelessWidget {
                         ),
                         title: Text(r["content"] ?? ""),
                         subtitle: Text(
-                          r["created_at"] ?? "",
+                          formatDate(r["created_at"]),
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,
