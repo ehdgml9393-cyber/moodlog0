@@ -5,6 +5,7 @@ import '../viewmodel/feed_provider.dart';
 import '../../records/ui/record_screen.dart';
 import '../../profile/ui/my_profile_screen.dart';
 import '../../profile/ui/user_profile_screen.dart';
+import '../viewmodel/like_provider.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({super.key});
@@ -63,69 +64,105 @@ class _FeedScreenState extends State<FeedScreen> {
         itemCount: provider.feeds.length,
         itemBuilder: (context, index) {
           final feed = provider.feeds[index];
+          final recordId = feed["record_id"];
 
-          return Card(
-            margin: const EdgeInsets.all(8),
-            child: ListTile(
-              leading: Text(
-                feed["emotion"] ?? "🙂",
-                style: const TextStyle(fontSize: 30),
-              ),
-
-              title: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => UserProfileScreen(
-                            userId: feed["user_id"],
-                          ),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 16,
-                          backgroundImage:
-                          feed["profile_image"] != null
-                              ? NetworkImage(feed["profile_image"])
-                              : null,
-                          child: feed["profile_image"] == null
-                              ? const Icon(Icons.person, size: 18)
-                              : null,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          feed["nickname"] ?? "사용자",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 4),
-                  Text(feed["content"] ?? ""),
-                  const SizedBox(height: 6),
-              Text(
-                formatDate(feed["created_at"]),
-                style: const TextStyle(fontSize: 12, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
+          return ChangeNotifierProvider(
+            create: (_) => LikeProvider()..load(recordId),
+            child: _FeedItem(feed: feed),
           );
         },
       ),
     );
   }
 }
+
+class _FeedItem extends StatelessWidget {
+  final Map<String, dynamic> feed;
+
+  const _FeedItem({required this.feed});
+
+  @override
+  Widget build(BuildContext context) {
+    final likeProvider = Provider.of<LikeProvider>(context);
+
+    return Card(
+      margin: const EdgeInsets.all(8),
+      child: ListTile(
+        leading: Text(
+          feed["emotion"] ?? "🙂",
+          style: const TextStyle(fontSize: 30),
+        ),
+
+        title: Row(
+          children: [
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => UserProfileScreen(
+                      userId: feed["user_id"],
+                    ),
+                  ),
+                );
+              },
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundImage: feed["profile_image"] != null
+                        ? NetworkImage(feed["profile_image"])
+                        : null,
+                    child: feed["profile_image"] == null
+                        ? const Icon(Icons.person, size: 18)
+                        : null,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    feed["nickname"] ?? "사용자",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(feed["content"] ?? ""),
+            const SizedBox(height: 6),
+            Text(
+              formatDate(feed["created_at"]),
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 10),
+
+            // ★ ★ ★ 좋아요 버튼 + 숫자 ★ ★ ★
+            Row(
+              children: [
+                IconButton(
+                  icon: Icon(
+                    likeProvider.isLiked
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: likeProvider.isLiked ? Colors.red : Colors.grey,
+                  ),
+                  onPressed: () async {
+                    await likeProvider.toggle(feed["record_id"]);
+                  },
+                ),
+                Text("${likeProvider.likeCount}"),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
