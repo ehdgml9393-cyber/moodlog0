@@ -29,7 +29,7 @@ class FollowRepository {
         .eq('following_id', targetId);
   }
 
-  // 🔹 내가 팔로우한 사용자 목록
+  //  내가 팔로우한 사용자 목록
   Future<List<Map<String, dynamic>>> getFollowingList(String myId) async {
     final res = await _supabase
         .from('follow_list')
@@ -39,7 +39,7 @@ class FollowRepository {
     return List<Map<String, dynamic>>.from(res);
   }
 
-  // 🔹 나를 팔로우한 사용자 목록
+  //  나를 팔로우한 사용자 목록
   Future<List<Map<String, dynamic>>> getFollowerList(String myId) async {
     final res = await _supabase
         .from('follow_list')
