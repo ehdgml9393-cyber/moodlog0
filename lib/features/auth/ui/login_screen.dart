@@ -3,13 +3,14 @@ import 'package:provider/provider.dart';
 import '../viewmodel/auth_provider.dart';
 
 
+
 // 로그인 화면
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<AppAuthProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(title: const Text('로그인')),

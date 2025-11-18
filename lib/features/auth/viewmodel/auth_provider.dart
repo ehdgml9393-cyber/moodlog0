@@ -4,12 +4,14 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../feed/ui/feed_screen.dart';
 
-class AuthProvider extends ChangeNotifier {
-  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
+class AppAuthProvider extends ChangeNotifier {
+  final firebase_auth.FirebaseAuth _auth =
+      firebase_auth.FirebaseAuth.instance;
   final SupabaseClient _supabase = Supabase.instance.client;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-    clientId: '761202198915-g83qhnmifbo8s2h22mqmduafsfr90s8g.apps.googleusercontent.com',
+    clientId:
+    '761202198915-g83qhnmifbo8s2h22mqmduafsfr90s8g.apps.googleusercontent.com',
   );
 
   firebase_auth.User? get user => _auth.currentUser;
@@ -27,6 +29,7 @@ class AuthProvider extends ChangeNotifier {
 
       final userCredential = await _auth.signInWithCredential(credential);
       final firebase_auth.User user = userCredential.user!;
+
       await _ensureUserInSupabase(user);
 
       if (context.mounted) {
@@ -36,10 +39,7 @@ class AuthProvider extends ChangeNotifier {
         );
       }
     } catch (e) {
-      debugPrint(" 로그인 실패: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("로그인 실패: $e")),
-      );
+      debugPrint("로그인 실패: $e");
     }
   }
 
@@ -67,3 +67,4 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+

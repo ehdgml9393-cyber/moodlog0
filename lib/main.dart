@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:moodlog0/features/profile/viewmodel/profile_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'features/feed/viewmodel/feed_provider.dart';
-import 'firebase_options.dart';
+
 import 'features/auth/viewmodel/auth_provider.dart';
+import 'firebase_options.dart';
+import 'features/feed/viewmodel/feed_provider.dart';
+import 'features/profile/viewmodel/profile_provider.dart';
 import 'features/records/viewmodel/record_provider.dart';
+
 import 'features/auth/ui/onboarding_screen.dart';
+import 'features/feed/ui/feed_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //  Firebase 초기화
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  //  Supabase 초기화
   await Supabase.initialize(
     url: 'https://vrhqmdgsbgdowpmqizsr.supabase.co',
     anonKey:
@@ -34,21 +36,35 @@ class MoodLogApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => AppAuthProvider()),
         ChangeNotifierProvider(create: (_) => FeedProvider()),
         ChangeNotifierProvider(create: (_) => RecordProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
-
       ],
       child: MaterialApp(
-        title: 'MoodLog',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         ),
-        home: const OnboardingScreen(),
+          // 여기서 자동로그인 처리
+        home: AuthGate(),
       ),
     );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // 이미 로그인되어있으면 ⇒ 홈으로
+      return const FeedScreen();
+    } else {
+      // 로그인 안 되어있으면 ⇒ 온보딩/로그인화면
+      return const OnboardingScreen();
+    }
   }
 }
 
