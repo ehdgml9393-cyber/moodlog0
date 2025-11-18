@@ -142,7 +142,7 @@ class _FeedItem extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // ★ ★ ★ 좋아요 버튼 + 숫자 ★ ★ ★
+           // 좋아요 버튼
             Row(
               children: [
                 IconButton(
