@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-
+import 'package:flutter/material.dart';
+import '../data/record_repository.dart';
 
 class RecordProvider extends ChangeNotifier {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  final RecordRepository _repo = RecordRepository();
 
   Future<void> addRecord({
     required String userId,
@@ -11,15 +10,11 @@ class RecordProvider extends ChangeNotifier {
     required String content,
   }) async {
     try {
-      await _supabase.from('records').insert({
-        'user_id': userId,
-        'emotion': emotion,
-        'content': content,
-        'created_at': DateTime.now(),
-      });
-
-      print("기록 저장 성공");
-      notifyListeners();
+      await _repo.addRecord(
+        userId: userId,
+        emotion: emotion,
+        content: content,
+      );
     } catch (e) {
       print("기록 저장 실패: $e");
       rethrow;

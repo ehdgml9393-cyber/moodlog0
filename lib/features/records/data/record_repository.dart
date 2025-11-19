@@ -8,18 +8,13 @@ class RecordRepository {
     required String emotion,
     required String content,
   }) async {
-    try {
-      await _supabase.from('records').insert({
-        'user_id': userId,
-        'emotion': emotion,
-        'content': content,
-        'created_at': DateTime.now().toIso8601String(),
-      });
-    } catch (e) {
-      print(' 기록 저장 오류: $e');
-      rethrow;
-    }
+    await _supabase.from('records').insert({
+      'user_id': userId,
+      'emotion': emotion,
+      'content': content,
+    });
   }
 }
+
 
 
