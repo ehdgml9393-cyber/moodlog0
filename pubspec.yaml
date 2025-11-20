@@ -10,23 +10,19 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # 기본 Flutter 아이콘
   cupertino_icons: ^1.0.8
 
-  # ✅ Firebase 관련
+  # Firebase
   firebase_core: ^3.1.1
   firebase_auth: ^5.1.1
 
-  # ✅ Google 로그인
+  # Google 로그인
   google_sign_in: ^6.2.1
 
-  # ✅ 상태관리
+  # Provider
   provider: ^6.1.2
 
-  # ✅ (선택) 나중에 피드 Firestore로 옮길 때 필요
-  cloud_firestore: ^5.1.0
-
+  # Supabase
   supabase_flutter: ^2.5.0
 
   intl: ^0.19.0
@@ -36,7 +32,19 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^5.0.0
 
+  # 앱 아이콘 생성기
+  flutter_launcher_icons: ^0.13.1
+
 flutter:
   uses-material-design: true
 
+  assets:
+    - assets/image/logo.png
+
+
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/image/logo.png"
 
