@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/utils/date.dart';
+import '../../comments/ui/comment_screen.dart';
 import '../viewmodel/feed_provider.dart';
 import '../../records/ui/record_screen.dart';
 import '../../profile/ui/my_profile_screen.dart';
@@ -34,19 +35,28 @@ class _FeedScreenState extends State<FeedScreen> {
       const MyProfileScreen(),
     ];
 
-    return Scaffold(
-      body: screens[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (i) async {
-          if (i == 0) await feedProvider.loadFeeds();
-          setState(() => _selectedIndex = i);
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "홈"),
-          BottomNavigationBarItem(icon: Icon(Icons.edit), label: "기록하기"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "프로필"),
-        ],
+    return WillPopScope(
+      onWillPop: () async {
+        // 홈 탭일 때만 앱 종료
+        if (_selectedIndex == 0) return true;
+
+        setState(() => _selectedIndex = 0);
+        return false;
+      },
+      child: Scaffold(
+        body: screens[_selectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (i) async {
+            if (i == 0) await feedProvider.loadFeeds();
+            setState(() => _selectedIndex = i);
+          },
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "홈"),
+            BottomNavigationBarItem(icon: Icon(Icons.edit), label: "기록하기"),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: "프로필"),
+          ],
+        ),
       ),
     );
   }
@@ -93,41 +103,36 @@ class _FeedItem extends StatelessWidget {
           style: const TextStyle(fontSize: 30),
         ),
 
-        title: Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => UserProfileScreen(
-                      userId: feed["user_id"],
-                    ),
-                  ),
-                );
-              },
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 16,
-                    backgroundImage: feed["profile_image"] != null
-                        ? NetworkImage(feed["profile_image"])
-                        : null,
-                    child: feed["profile_image"] == null
-                        ? const Icon(Icons.person, size: 18)
-                        : null,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    feed["nickname"] ?? "사용자",
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+        //프로필 클릭 시 상대 프로필 이동
+        title: GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => UserProfileScreen(
+                  userId: feed["user_id"],
+                ),
               ),
-            ),
-          ],
+            );
+          },
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 16,
+                backgroundImage: feed["profile_image"] != null
+                    ? NetworkImage(feed["profile_image"])
+                    : null,
+                child: feed["profile_image"] == null
+                    ? const Icon(Icons.person, size: 18)
+                    : null,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                feed["nickname"] ?? "사용자",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
         ),
 
         subtitle: Column(
@@ -140,9 +145,10 @@ class _FeedItem extends StatelessWidget {
               formatDate(feed["created_at"]),
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
+
             const SizedBox(height: 10),
 
-           // 좋아요 버튼
+            // 좋아요 버튼
             Row(
               children: [
                 IconButton(
@@ -159,10 +165,33 @@ class _FeedItem extends StatelessWidget {
                 Text("${likeProvider.likeCount}"),
               ],
             ),
+
+            const SizedBox(height: 6),
+
+            // 댓글 버튼
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => CommentScreen(recordId: feed["record_id"]),
+                  ),
+                );
+              },
+              child: const Padding(
+                padding: EdgeInsets.only(top: 6),
+                child: Text(
+                  "💬 댓글 보기",
+                  style: TextStyle(
+                    color: Colors.blue,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
