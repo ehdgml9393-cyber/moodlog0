@@ -5,7 +5,7 @@ import '../viewmodel/user_profile_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserProfileScreen extends StatelessWidget {
-  final String userId; // 상대 유저 id
+  final String userId;
 
   const UserProfileScreen({super.key, required this.userId});
 
