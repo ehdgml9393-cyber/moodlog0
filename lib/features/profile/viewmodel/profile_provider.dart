@@ -5,7 +5,7 @@ class ProfileProvider extends ChangeNotifier {
   final ProfileRepository _repo = ProfileRepository();
 
   Map<String, dynamic>? profile;
-  List<Map<String, dynamic>> followingUsers = [];
+  List<Map<String, dynamic>> myRecords = [];   // ✨ 내가 쓴 글들
 
   bool isLoading = false;
 
@@ -14,17 +14,14 @@ class ProfileProvider extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
+      // 프로필 + 내 기록 둘 다 불러오기
       profile = await _repo.getProfile(userId);
+      myRecords = await _repo.getMyRecords(userId);
     } finally {
       isLoading = false;
       notifyListeners();
     }
   }
-
-
-  Future<void> loadFollowing(String userId) async {
-    followingUsers = await _repo.getFollowingUsers(userId);
-    notifyListeners();
-  }
 }
+
 

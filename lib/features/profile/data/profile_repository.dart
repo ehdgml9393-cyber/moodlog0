@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class ProfileRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
 
+  // 기본 프로필 + 통계
   Future<Map<String, dynamic>?> getProfile(String userId) async {
     try {
       final user = await _supabase
@@ -46,19 +47,18 @@ class ProfileRepository {
     }
   }
 
-  /// ⭐ 추가: 내가 팔로우한 사용자 목록 불러오기
-  Future<List<Map<String, dynamic>>> getFollowingUsers(String userId) async {
+  // 내가 쓴 기록들 가져오기
+  Future<List<Map<String, dynamic>>> getMyRecords(String userId) async {
     try {
       final res = await _supabase
-          .from('follows')
-          .select('following_id, users!follows_following_id_fkey(*)')
-          .eq('follower_id', userId);
+          .from('records')
+          .select('record_id, emotion, content, created_at')
+          .eq('user_id', userId)
+          .order('created_at', ascending: false);
 
-      return List<Map<String, dynamic>>.from(
-        res.map((item) => item['users']),
-      );
+      return List<Map<String, dynamic>>.from(res);
     } catch (e) {
-      print("팔로잉 목록 오류: $e");
+      print("내 기록 목록 오류: $e");
       return [];
     }
   }
