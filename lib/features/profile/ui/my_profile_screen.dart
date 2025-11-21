@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:moodlog0/features/profile/ui/followers_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/utils/date.dart';
@@ -37,6 +38,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       );
     }
 
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
     return Scaffold(
       appBar: AppBar(title: const Text("내 프로필")),
       body: SingleChildScrollView(
@@ -56,8 +59,50 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     : null,
               ),
               title: Text(profile['nickname']),
-              subtitle: Text(
-                "팔로워 ${profile['followers']} • 팔로잉 ${profile['following']}",
+
+
+              subtitle: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FollowListScreen(
+                            userId: uid,
+                            showFollowing: false, // 팔로워 보기
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "팔로워 ${profile['followers']}",
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FollowListScreen(
+                            userId: uid,
+                            showFollowing: true, // 팔로잉 보기
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "팔로잉 ${profile['following']}",
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 20),
@@ -107,7 +152,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                       title: Text(r["content"] ?? ""),
                       subtitle: Text(
-                        formatDate(r["created_at"]),   // yyyy년 MM월 dd일 HH:mm
+                        formatDate(r["created_at"]),
                         style: const TextStyle(fontSize: 12),
                       ),
                     ),
