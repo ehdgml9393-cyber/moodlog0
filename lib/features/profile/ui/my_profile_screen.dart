@@ -149,7 +149,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             const Divider(),
             const SizedBox(height: 12),
 
-            // 🔹 나의 기록
+            //  나의 기록
             const Text(
               "나의 감정 기록",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
