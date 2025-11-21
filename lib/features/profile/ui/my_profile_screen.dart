@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:moodlog0/features/profile/ui/followers_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/utils/date.dart';
 import '../viewmodel/profile_provider.dart';
+import '../../auth/viewmodel/auth_provider.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -38,16 +38,34 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       );
     }
 
-    final uid = FirebaseAuth.instance.currentUser!.uid;
-
     return Scaffold(
-      appBar: AppBar(title: const Text("내 프로필")),
+      appBar: AppBar(
+        title: const Text("내 프로필"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () async {
+              await Provider.of<AppAuthProvider>(context, listen: false)
+                  .signOut();
+
+              if (mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/',
+                      (route) => false,
+                );
+              }
+            },
+          ),
+        ],
+      ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 프로필 영역
+            //  프로필 영역
             ListTile(
               leading: CircleAvatar(
                 radius: 30,
@@ -59,50 +77,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     : null,
               ),
               title: Text(profile['nickname']),
-
-
-              subtitle: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => FollowListScreen(
-                            userId: uid,
-                            showFollowing: false, // 팔로워 보기
-                          ),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      "팔로워 ${profile['followers']}",
-                      style: const TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => FollowListScreen(
-                            userId: uid,
-                            showFollowing: true, // 팔로잉 보기
-                          ),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      "팔로잉 ${profile['following']}",
-                      style: const TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
-                    ),
-                  ),
-                ],
+              subtitle: Text(
+                "팔로워 ${profile['followers']} • 팔로잉 ${profile['following']}",
               ),
             ),
             const SizedBox(height: 20),
@@ -124,7 +100,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             const Divider(),
             const SizedBox(height: 12),
 
-            // 내가 쓴 감정 기록 리스트
+            //  내가 쓴 감정 기록
             const Text(
               "나의 감정 기록",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -165,5 +141,3 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 }
-
-
