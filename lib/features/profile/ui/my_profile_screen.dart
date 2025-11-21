@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/utils/date.dart';
 import '../viewmodel/profile_provider.dart';
 import '../../auth/viewmodel/auth_provider.dart';
+import 'followers_screen.dart'; //
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -38,25 +39,30 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       );
     }
 
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("내 프로필"),
+
+        // AppBar 오른쪽 로그아웃 버튼 추가
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
-              await Provider.of<AppAuthProvider>(context, listen: false)
-                  .signOut();
+              final auth = Provider.of<AppAuthProvider>(context, listen: false);
+              await auth.signOut();
 
-              if (mounted) {
-                Navigator.pushNamedAndRemoveUntil(
-                  context,
-                  '/',
-                      (route) => false,
-                );
-              }
+              if (!mounted) return;
+
+              // 로그인 화면으로 이동
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                "/login",
+                    (route) => false,
+              );
             },
-          ),
+          )
         ],
       ),
 
@@ -65,7 +71,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //  프로필 영역
+            // 🔹 프로필 영역
             ListTile(
               leading: CircleAvatar(
                 radius: 30,
@@ -77,10 +83,53 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     : null,
               ),
               title: Text(profile['nickname']),
-              subtitle: Text(
-                "팔로워 ${profile['followers']} • 팔로잉 ${profile['following']}",
+
+              // 팔로워 / 팔로잉 이동 가능
+              subtitle: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FollowListScreen(
+                            userId: uid,
+                            showFollowing: false,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "팔로워 ${profile['followers']}",
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => FollowListScreen(
+                            userId: uid,
+                            showFollowing: true,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "팔로잉 ${profile['following']}",
+                      style: const TextStyle(
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
+
             const SizedBox(height: 20),
 
             // 🔹 감정 통계
@@ -100,7 +149,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             const Divider(),
             const SizedBox(height: 12),
 
-            //  내가 쓴 감정 기록
+            // 🔹 나의 기록
             const Text(
               "나의 감정 기록",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -141,3 +190,4 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 }
+
