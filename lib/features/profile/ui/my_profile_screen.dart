@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/utils/date.dart';
 import '../viewmodel/profile_provider.dart';
 import '../../auth/viewmodel/auth_provider.dart';
-import 'followers_screen.dart'; //
+import 'followers_screen.dart';
 
 class MyProfileScreen extends StatefulWidget {
   const MyProfileScreen({super.key});
@@ -45,24 +45,20 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       appBar: AppBar(
         title: const Text("내 프로필"),
 
-        // AppBar 오른쪽 로그아웃 버튼 추가
+        // 상단 로그아웃 버튼
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () async {
-              final auth = Provider.of<AppAuthProvider>(context, listen: false);
-              await auth.signOut();
+              await Provider.of<AppAuthProvider>(context, listen: false)
+                  .signOut();
 
-              if (!mounted) return;
-
-              // 로그인 화면으로 이동
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                "/login",
-                    (route) => false,
-              );
+              if (mounted) {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/', (route) => false);
+              }
             },
-          )
+          ),
         ],
       ),
 
@@ -71,7 +67,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 프로필 영역
+            // 프로필 영역
             ListTile(
               leading: CircleAvatar(
                 radius: 30,
@@ -84,7 +80,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               ),
               title: Text(profile['nickname']),
 
-              // 팔로워 / 팔로잉 이동 가능
+              // 팔로워 / 팔로잉
               subtitle: Row(
                 children: [
                   GestureDetector(
@@ -94,7 +90,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         MaterialPageRoute(
                           builder: (_) => FollowListScreen(
                             userId: uid,
-                            showFollowing: false,
+                            showFollowing: false, // 팔로워
                           ),
                         ),
                       );
@@ -102,8 +98,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     child: Text(
                       "팔로워 ${profile['followers']}",
                       style: const TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
+                          decoration: TextDecoration.underline),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -114,7 +109,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         MaterialPageRoute(
                           builder: (_) => FollowListScreen(
                             userId: uid,
-                            showFollowing: true,
+                            showFollowing: true, // 팔로잉
                           ),
                         ),
                       );
@@ -122,8 +117,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     child: Text(
                       "팔로잉 ${profile['following']}",
                       style: const TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),
+                          decoration: TextDecoration.underline),
                     ),
                   ),
                 ],
@@ -132,12 +126,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
             const SizedBox(height: 20),
 
-            // 🔹 감정 통계
+            /// 🔹 감정 통계
             const Text(
               "감정 통계",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
+
             Wrap(
               spacing: 10,
               children: profile['emotion_stats'].entries.map<Widget>((e) {
@@ -149,7 +144,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             const Divider(),
             const SizedBox(height: 12),
 
-            //  나의 기록
+            /// 🔹 내가 쓴 감정 기록
             const Text(
               "나의 감정 기록",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
@@ -190,4 +185,3 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 }
-
